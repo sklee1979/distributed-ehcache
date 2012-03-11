@@ -4,13 +4,13 @@ import com.kole.cache.hashing.Node;
 
 public class CacheNode implements Node {
 	private final String name;
-	
-	public CacheNode(String cacheName) {
-		this.name = cacheName;
+
+	public CacheNode(String name) {
+		this.name = name;
 	}
 
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 }

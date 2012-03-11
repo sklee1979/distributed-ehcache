@@ -1,5 +1,6 @@
 package com.kole.cache.hashing;
 
+
 /**
  * 
  * @author edwardlee
@@ -10,7 +11,9 @@ public interface ConsistentHashing {
 
 	void deleteNode(Node node);
 
-	Node findNode(byte[] key);
+	boolean isNodeExisted(Node node);
+
+	Node findNode(String key);
 
 	int size();
 

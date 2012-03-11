@@ -32,7 +32,6 @@ public class ConsistentHashingTest {
 			ConsistentHashing hashing = ConsistentHashingImpl.getInstance(nodes, Hash.SHA1);
 			assertTrue("Size incorrect: " + hashing.size(), hashing.size() == 10 * ConsistentHashingImpl.REPLICA);
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail("Error in constructor");
 		}
@@ -44,7 +43,6 @@ public class ConsistentHashingTest {
 			ConsistentHashing hashing = ConsistentHashingImpl.getInstance(nodes);
 			assertTrue("Size incorrect: " + hashing.size(), hashing.size() == 10 * ConsistentHashingImpl.REPLICA);
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail("Error in constructor");
 		}
@@ -56,10 +54,9 @@ public class ConsistentHashingTest {
 			ConsistentHashing hashing = ConsistentHashingImpl.getInstance(nodes);
 			hashing.addNode(new CacheNode("Node11"));
 			assertTrue("Size incorrect: " + hashing.size(), hashing.size() == 11 * ConsistentHashingImpl.REPLICA);
-			Node node = hashing.findNode("Node11-3234".getBytes());
+			Node node = hashing.findNode("Node11-3234");
 			assertTrue("Get the wrong node back: " + node.getName(), node.getName().equals("Node11"));
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail("Error in constructor");
 		}
@@ -70,12 +67,25 @@ public class ConsistentHashingTest {
 	public void testDeleteNode() {
 		try {
 			ConsistentHashing hashing = ConsistentHashingImpl.getInstance(nodes);
-			hashing.deleteNode(new CacheNode("Node11"));
-			assertTrue("Size incorrect: " + hashing.size(), hashing.size() == 10 * ConsistentHashingImpl.REPLICA);
-			Node node = hashing.findNode("Node11-5474".getBytes());
-			assertTrue("Get the wrong node back: " + node.getName(), !node.getName().startsWith("Node11"));
+			hashing.deleteNode(new CacheNode("Node1"));
+			assertTrue("Size incorrect: " + hashing.size(), hashing.size() == 9 * ConsistentHashingImpl.REPLICA);
+			Node node = hashing.findNode("Node1-5474");
+			assertTrue("Get the wrong node back: " + node.getName(), !node.getName().startsWith("Node1-"));
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail("Error in constructor");
+		}
+	}
+
+	@Test
+	public void testIsNodeExisted() {
+		try {
+			ConsistentHashing hashing = ConsistentHashingImpl.getInstance(nodes);
+			boolean existed = hashing.isNodeExisted(new CacheNode("Node9"));
+			assertTrue("isNodeExisted check failed", existed);
+			hashing.addNode(new CacheNode("Node9"));
+			assertTrue("Size incorrect: " + hashing.size(), hashing.size() == 10 * ConsistentHashingImpl.REPLICA);
+		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			fail("Error in constructor");
 		}

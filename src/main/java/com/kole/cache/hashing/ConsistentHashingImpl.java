@@ -15,8 +15,7 @@ public class ConsistentHashingImpl implements ConsistentHashing {
 	public static final int REPLICA = 10000;
 	private final TreeMap<String, Node> hashMap = new TreeMap<String, Node>();
 
-	private ConsistentHashingImpl(List<Node> nodes, Hash algorithm)
-			throws NoSuchAlgorithmException {
+	private ConsistentHashingImpl(List<Node> nodes, Hash algorithm) throws NoSuchAlgorithmException {
 		Security.addProvider(new BouncyCastleProvider());
 		this.digest = MessageDigest.getInstance(algorithm.toStirng());
 		for (Node node : nodes) {
@@ -26,20 +25,26 @@ public class ConsistentHashingImpl implements ConsistentHashing {
 		}
 	}
 
-	public static ConsistentHashingImpl getInstance(List<Node> nodes,
-			Hash algorithm) throws NoSuchAlgorithmException {
+	public static ConsistentHashingImpl getInstance(List<Node> nodes, Hash algorithm) throws NoSuchAlgorithmException {
 		return new ConsistentHashingImpl(nodes, algorithm);
 	}
 
-	public static ConsistentHashingImpl getInstance(List<Node> nodes)
-			throws NoSuchAlgorithmException {
+	public static ConsistentHashingImpl getInstance(List<Node> nodes) throws NoSuchAlgorithmException {
 		return new ConsistentHashingImpl(nodes, Hash.SHA1);
 	}
 
 	public void addNode(Node node) {
-		for (int i = 0; i < REPLICA; i++) {
-			hashMap.put(this.hashing(node.getName() + "-" + i), node);
+		if (isNodeExisted(node)) {
+			return;
 		}
+
+		for (int i = 0; i < REPLICA; i++) {
+			// key for the new node
+			final String newNode = this.hashing(node.getName() + "-" + i);
+
+			hashMap.put(newNode, node);
+		}
+
 	}
 
 	public void deleteNode(Node node) {
@@ -48,8 +53,8 @@ public class ConsistentHashingImpl implements ConsistentHashing {
 		}
 	}
 
-	public Node findNode(byte[] key) {
-		String location = Base64.encodeBase64String(this.digest.digest(key));
+	public Node findNode(String key) {
+		String location = this.hashing(key);
 		SortedMap<String, Node> nodes = hashMap.tailMap(location);
 		if (nodes.size() == 0) {
 			return hashMap.firstEntry().getValue();
@@ -65,6 +70,11 @@ public class ConsistentHashingImpl implements ConsistentHashing {
 
 	public String hashing(String key) {
 		return Base64.encodeBase64String(this.digest.digest(key.getBytes()));
+	}
+
+	public boolean isNodeExisted(Node node) {
+		String key = this.hashing(node.getName() + "-0");
+		return hashMap.containsKey(key);
 	}
 
 }
